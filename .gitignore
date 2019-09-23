@@ -1,2 +1,6 @@
 node_modules
 chrome
+output/*.mp4
+output/*.avi
+assets/Logs de produto.aep
+assets/Salvamento automático do Adobe After Effects

@@ -23,7 +23,7 @@ exports.telegramSender = async function (id) {
       options.addArguments(`--user-data-dir=chrome`);
       var driver = new Builder().withCapabilities(options).build();
       await driver.get('https://web.telegram.org/#/im')
-      await sleep(3000);
+      await sleep(6000);
       await driver.findElements(By.tagName('span')).then(async elems => {
         var array = await elems
         for (let index = 0; index < array.length; index++) {
@@ -32,7 +32,7 @@ exports.telegramSender = async function (id) {
           if (text === id) {
             console.log(await element.getText())
             await element.click()
-            await sleep(2000);
+            await sleep(8000);
             await element.findElement(By.xpath('//*[@id="ng-app"]/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]')).sendKeys("")
             await sleep(1000)
             await element.findElement(By.xpath('//*[@id="ng-app"]/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]')).sendKeys(Key.CONTROL, 'a')
@@ -42,7 +42,7 @@ exports.telegramSender = async function (id) {
             await element.findElement(By.xpath('//*[@id="ng-app"]/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]')).sendKeys(Key.CONTROL, 'v')
             await sleep(2000);
             await element.findElement(By.xpath('//*[@id="ng-app"]/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[3]/div[2]/input')).sendKeys(image);
-            await sleep(2000);
+            await sleep(8000);
             await element.findElement(By.xpath('//*[@id="ng-app"]/body/div[1]/div[2]/div/div[2]/div[3]/div/div[3]/div[2]/div/div/div/form/div[2]/div[5]')).sendKeys(Key.ENTER)
             await sleep(3000)
             try {

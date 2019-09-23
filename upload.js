@@ -73,8 +73,8 @@ exports.uploadVideo = async function () {
 
             await sleep(3000)
             if (tt === 'Upload concluído!') {
-                await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[1]/div[1]/div/div/button')).click();
                 tr = false
+                await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[1]/div[1]/div/div/button')).click();
                 await sleep(3000)
                 await driver.quit()
             }

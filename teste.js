@@ -6,8 +6,7 @@ const request = require('request')
 
 async function testePelando() {
     try {
-        await telegram.createTelegramMessage()
-        await telegram.telegramSender("Telegram")
+       await pelando.fetchData()
     } catch (error) {
         console.log(error)
     }

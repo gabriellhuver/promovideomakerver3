@@ -10,6 +10,7 @@ exports.fetchData = async function () {
     return new Promise(async (resolve, reject) => {
         console.log('Buscando pelos melhores produtos no pelando.com')
         var prodList = []
+        var database = await tools.loadJson('./output/database.json')
         var options = new Chrome.Options();
         const url = 'https://www.pelando.com.br/quente'
         options.addArguments('--user-data-dir=chrome');
@@ -77,8 +78,10 @@ exports.fetchData = async function () {
                             product.username = await element.findElement(By.className("thread-username")).getText()
                         } catch (error) { }
                         if (product.seller === 'Submarino' || product.seller === 'Americanas' || product.seller === 'Shoptime') {
-                            prodList.push(product)
-                            console.log(product)
+                            if (!database.videos.indexOf(product.url) > -1) {
+                                prodList.push(product)
+                                console.log(product)
+                            }
                         }
                     } catch (error) { }
 
@@ -88,9 +91,7 @@ exports.fetchData = async function () {
             }
             await driver.quit()
             console.log('Organizando produtos na lista!')
-            prodList = prodList.sort(function (a, b) {
-                return a.percent - b.percent;
-            })
+            prodList = sortByKey(prodList, 'percent')
             await tools.saveToJson('./output/pelando.json', prodList)
             console.log('Lista salva com sucesso! ./output/pelando.json')
             resolve()
@@ -98,6 +99,12 @@ exports.fetchData = async function () {
 
     })
 
+}
+function sortByKey(array, key) {
+    return array.sort(function (a, b) {
+        var x = a[key]; var y = b[key];
+        return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+    });
 }
 function sleep(ms) {
     return new Promise(resolve => {

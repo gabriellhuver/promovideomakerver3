@@ -62,6 +62,7 @@ async function createVideo() {
                 process.exit()
             }
         }
+        createVideo()
     } catch (error) {
         console.log(error)
     }
@@ -95,9 +96,22 @@ async function creavideoByPelandoData(video) {
             await tools.saveToJson('./video.json', currentVideo)
             console.log('Dados do video salvos em videos.json')
             console.log(currentVideo)
-            //let create = await tools.readOptions('Continue ?', ["Sim", "Não"])
             try {
                 await prepareImages()
+            } catch (error) {
+                console.log('Erro na preparaçao das imagens')
+            }
+            try {
+
+                await telegram.createTelegramMessage()
+                await telegram.telegramSender(config.telegramGroup)
+                await tools.saveToJson('./video.json', currentVideo)
+            } catch (error) {
+                console.log("Erro on telegram sender")
+                reject()
+            }
+            try {
+
                 await mountTemplate()
                 await tools.saveToJson('./video.json', currentVideo)
             } catch (error) {
@@ -112,15 +126,7 @@ async function creavideoByPelandoData(video) {
                 console.log('Error on converting')
                 reject()
             }
-            try {
 
-                await telegram.createTelegramMessage()
-                await telegram.telegramSender(config.telegramGroup)
-                await tools.saveToJson('./video.json', currentVideo)
-            } catch (error) {
-                console.log("Erro on telegram sender")
-                reject()
-            }
             try {
                 await upload.uploadVideo()
                 database.videos.push(video.url)
