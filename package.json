@@ -1,0 +1,24 @@
+{
+  "name": "promo-video-maker-ver3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "after-effects": "^0.4.15",
+    "cheerio": "^1.0.0-rc.3",
+    "chromedriver": "^76.0.0",
+    "clipboardy": "^2.1.0",
+    "gm": "^1.23.1",
+    "handbrake-js": "^4.0.0",
+    "image-downloader": "^3.5.0",
+    "readline-sync": "^1.4.10",
+    "request": "^2.88.0",
+    "selenium-webdriver": "^4.0.0-alpha.5"
+  }
+}

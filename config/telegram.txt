@@ -1,0 +1,4 @@
+Promoção #produto# por apenas #price# !
+Confira pelo link !
+-> #link# 
+#cupom#

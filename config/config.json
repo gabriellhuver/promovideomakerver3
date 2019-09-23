@@ -1,0 +1,22 @@
+{
+    "codigo": "AFL-03-5879130",
+    "afterEffectsPath": "C:\\Program Files\\Adobe\\Adobe After Effects CC 2019\\",
+    "project": "C:\\node\\promo-video-maker-ver3\\assets\\produto.aep",
+    "chrome": "C:\\node\\promo-video-maker-ver3\\chrome",
+    "comp": "Project Final",
+    "OMtemplate": "Sem perdas",
+    "output": "C:\\node\\promo-video-maker-ver3\\output\\video.avi",
+    "converted": "C:\\node\\promo-video-maker-ver3\\output\\video.mp4",
+    "desc": "C:\\node\\promo-video-maker-ver3\\config\\descrição.txt",
+    "descCupom": "C:\\node\\promo-video-maker-ver3\\config\\descriçãoCupom.txt",
+    "telegramGroup": "Telegram",
+    "tags": [
+        "promoções",
+        "ofertas",
+        "desconto",
+        "descontos",
+        "grátis",
+        "brinde",
+        "sorteio"
+    ]
+}
