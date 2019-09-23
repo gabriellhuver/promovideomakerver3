@@ -93,9 +93,10 @@ exports.createTelegramMessage = function () {
         message = message.replace('#cupom#', '')
       }
 
-      await fs.copyFileSync(video.imagesNoBg[0], `./output/telegram/image.png`)
-      await fs.writeFileSync(`./output/telegram/message.txt`, message)
+      fs.copyFileSync(video.imagesNoBg[0], `./output/telegram/image.png`)
+      fs.writeFileSync(`./output/telegram/message.txt`, message)
       console.log(`Mensagem salva em ./output/telegram/message.txt`)
+      await sleep(1000)
       resolve()
     } catch (error) {
       reject(error)

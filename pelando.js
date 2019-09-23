@@ -78,6 +78,7 @@ exports.fetchData = async function () {
                             product.username = await element.findElement(By.className("thread-username")).getText()
                         } catch (error) { }
                         if (product.seller === 'Submarino' || product.seller === 'Americanas' || product.seller === 'Shoptime') {
+                            product.url = await getRealUrl(product.url)
                             if (!database.videos.indexOf(product.url) > -1) {
                                 prodList.push(product)
                                 console.log(product)
@@ -109,5 +110,18 @@ function sortByKey(array, key) {
 function sleep(ms) {
     return new Promise(resolve => {
         setTimeout(resolve, ms)
+    })
+}
+async function getRealUrl(url) {
+    return new Promise((resolve, reject) => {
+        request.get({ url: url, followAllRedirects: true }, function (err, res, body) {
+            try {
+                if (err) console.log(err)
+                resolve(res.request.uri.href)
+            } catch (error) {
+                console.log(`Erro ${url}`)
+                reject()
+            }
+        });
     })
 }

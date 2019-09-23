@@ -71,11 +71,16 @@ async function creavideoByPelandoData(video) {
     return new Promise(async (resolve, reject) => {
         try {
 
-            video.url = await getRealUrl(video.url)
             if (!video.url.includes("/produto/")) reject()
             currentVideo.url = tools.wrapLinkAfiliado(video.url, config.codigo)
             try {
-                currentVideo.metadata = await content.fetchContent(video.url);
+                while (!currentVideo.metadata) {
+                    try {
+                        currentVideo.metadata = await content.fetchContent(video.url);
+                    } catch (error) {
+                        console.log('Tentando denovo kkk')
+                    }
+                }
             } catch (error) {
                 console.log("Erro on fetch products")
                 reject()
@@ -202,16 +207,3 @@ async function mountTemplate() {
 
 
 
-async function getRealUrl(url) {
-    return new Promise((resolve, reject) => {
-        request.get({ url: url, followAllRedirects: true }, function (err, res, body) {
-            try {
-                if (err) console.log(err)
-                resolve(res.request.uri.href)
-            } catch (error) {
-                console.log(`Erro ${url}`)
-                reject()
-            }
-        });
-    })
-}
