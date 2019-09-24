@@ -1,4 +1,5 @@
 
+const teste = "ver"
 const tools = require('./tools')
 const content = require('./content')
 const image = require('./image')
