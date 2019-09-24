@@ -49,7 +49,7 @@ exports.uploadVideo = async function () {
         await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[2]/div/div/div[1]/div[3]/form/div[1]/fieldset[1]/div/label[1]/span/input')).clear();
         await driver.findElement(By
             .xpath(YoutubeVideoTittleXPATH))
-            .sendKeys(video.videoTitle);
+            .sendKeys(String(video.videoTitle).substring(0, 75));
         await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[2]/div/div/div[1]/div[3]/form/div[1]/fieldset[1]/div/label[2]/span/textarea')).sendKeys(Key.CONTROL, 'v')
 
     } catch (error) {

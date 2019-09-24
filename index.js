@@ -12,10 +12,20 @@ var videoList = []
 var currentVideo = {}
 var database = []
 
-init()
+loadConfigs().then(() => {
+    console.log('Configurações carregadas! Iniciando programa')
+    init()
+})
 async function init() {
     return new Promise(async (resolve, reject) => {
-        let i = await tools.readOptions('O que deseja fazer?', ["Criar videos", "Abrir navegador"])
+        let i = await tools.readOptions('O que deseja fazer?',
+            [
+                "Criar videos",
+                "Abrir navegador",
+                "Force Upload!",
+                "Force telegram message!",
+                "Force image prepare",
+                "Force download metadata"])
         switch (i) {
             case 0:
                 createVideo()
@@ -25,7 +35,37 @@ async function init() {
                 init()
                 break;
             case 2:
-                createVideo()
+                await upload.uploadVideo()
+                break;
+            case 3:
+                try {
+                    await telegram.createTelegramMessage()
+                    await telegram.telegramSender(config.telegramGroup)
+                    await tools.saveToJson('./video.json', currentVideo)
+                } catch (error) {
+                    console.log("Erro on telegram sender")
+                    reject()
+                }
+                break;
+            case 4:
+                await prepareImages()
+                break;
+            case 5:
+                try {
+                    await loadConfigs()
+                    currentVideo.metadata = null
+                    while (!currentVideo.metadata) {
+                        try {
+                            currentVideo.metadata = await content.fetchContent(currentVideo.url);
+                            await tools.saveToJson('./video.json', currentVideo)
+                        } catch (error) {
+                            console.log('Tentando pegando metadados novamente !')
+                        }
+                    }
+                } catch (error) {
+                    console.log("Erro on fetch products")
+                    reject()
+                }
                 break;
             default:
                 break;
@@ -33,12 +73,22 @@ async function init() {
     })
 }
 
+async function loadConfigs() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            config = await tools.loadJson('./config/config.json')
+            database = await tools.loadJson('./output/database.json')
+            currentVideo = await tools.loadJson('./video.json')
+            resolve()
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 
 async function createVideo() {
     try {
-        console.log('Carregando configurações e banco de dados!')
-        config = await tools.loadJson('./config/config.json')
-        database = await tools.loadJson('./output/database.json')
+        await loadConfigs()
         await pelando.fetchData()
         videoList = await tools.loadJson('./output/pelando.json')
         var video = {}
@@ -74,11 +124,13 @@ async function creavideoByPelandoData(video) {
             if (!video.url.includes("/produto/")) reject()
             currentVideo.url = tools.wrapLinkAfiliado(video.url, config.codigo)
             try {
+                currentVideo.metadata = null
                 while (!currentVideo.metadata) {
                     try {
                         currentVideo.metadata = await content.fetchContent(video.url);
+                        await tools.saveToJson('./video.json', currentVideo)
                     } catch (error) {
-                        console.log('Tentando denovo kkk')
+                        console.log('Tentando pegando metadados novamente !')
                     }
                 }
             } catch (error) {
@@ -99,6 +151,7 @@ async function creavideoByPelandoData(video) {
             currentVideo.converted = config.converted
             currentVideo.tags = config.tags
             await tools.saveToJson('./video.json', currentVideo)
+
             console.log('Dados do video salvos em videos.json')
             console.log(currentVideo)
             try {

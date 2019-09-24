@@ -32,7 +32,7 @@ exports.readOptions = async function (question, prefixies) {
   return new Promise((resolve, reject) => {
     try {
       let index = readLineSync.keyInSelect(prefixies, question);
-      if(index === -1) process.exit()
+      if (index === -1) process.exit()
       resolve(index)
     } catch (error) {
       reject(error)
@@ -92,16 +92,16 @@ exports.cleanImgDir = function () {
     try {
       var imgPath = "./assets/Footage/imgs/"
       fs.readdir(imgPath, (err, files) => {
-        if (err) throw err;
+        if (err) console.log(err);
         for (const file of files) {
           fs.unlink(imgPath + file, err => {
-            if (err) throw err;
+            if (err) console.log(err);
           });
         }
+        resolve()
       });
-      resolve()
     } catch (error) {
-      reject(error)
+      console.log(error)
     }
   })
 }
