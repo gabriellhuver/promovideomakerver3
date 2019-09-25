@@ -4,21 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "after-effects": "^0.4.15",
+    "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
+    "chrome-launcher": "^0.11.2",
     "chromedriver": "^76.0.0",
     "clipboardy": "^2.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "gm": "^1.23.1",
     "handbrake-js": "^4.0.0",
+    "http": "0.0.0",
     "image-downloader": "^3.5.0",
     "readline-sync": "^1.4.10",
     "request": "^2.88.0",
-    "selenium-webdriver": "^4.0.0-alpha.5"
+    "selenium-webdriver": "^4.0.0-alpha.5",
+    "socketio": "^1.0.0"
   }
 }

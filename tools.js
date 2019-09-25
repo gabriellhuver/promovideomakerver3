@@ -8,7 +8,8 @@ exports.wrapLinkAfiliado = function (url, cod) {
 }
 exports.getVideoName = function (video) {
   try {
-    return video.name.split(" ")[0] + " " + video.name.split(" ")[1] + " " + video.name.split(" ")[2] + " " + video.name.split(" ")[3] + " " + video.name.split(" ")[5];
+    var str = String(video.name.split(" ")[0] + " " + video.name.split(" ")[1] + " " + video.name.split(" ")[2] + " " + video.name.split(" ")[3] + " " + video.name.split(" ")[5])
+    return str.replace("undefined", "");
   } catch (error) {
     return video.name;
   }

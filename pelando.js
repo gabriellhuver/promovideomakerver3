@@ -80,11 +80,13 @@ exports.fetchData = async function () {
                         if (product.seller === 'Submarino' || product.seller === 'Americanas' || product.seller === 'Shoptime') {
                             product.url = await getRealUrl(product.url)
                             if (!database.videos.indexOf(product.url) > -1) {
-                                prodList.push(product)
-                                console.log(product)
+                                if (!product.url.includes('/lojista/')) {
+                                    prodList.push(product)
+                                    console.log(product)
+                                }
                             }
                         }
-                    } catch (error) { }
+                    } catch (error) { console.log(error) }
 
                 } catch (error) {
                     console.log(error)

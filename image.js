@@ -5,7 +5,32 @@ const tools = require('./tools')
 const self = this
 const path = require('path')
 
+exports.pickImages = async function () {
+    return new Promise(async (resolve, reject) => {
+        try {
+            var currentVideo = await tools.loadJson('./video.json')
+            if (currentVideo.images.length === 1) {
+                currentVideo.primeiraImagem = 0
+                currentVideo.segundaImagem = 0
+                currentVideo.terceiraImagem = 0
 
+            } else if (currentVideo.images.length === 2) {
+                currentVideo.primeiraImagem = 0
+                currentVideo.segundaImagem = 1
+                currentVideo.terceiraImagem = 0
+
+            } else {
+                currentVideo.primeiraImagem = 0
+                currentVideo.segundaImagem = 1
+                currentVideo.terceiraImagem = 2
+            }
+            await tools.saveToJson('./video.json', currentVideo)
+            resolve()
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 
 exports.downloadImagesFromMetadata = function () {
     return new Promise(async (resolve, reject) => {

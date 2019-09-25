@@ -11,10 +11,13 @@ var videoList = []
 var currentVideo = {}
 var database = []
 
+
 loadConfigs().then(() => {
     console.log('Configurações carregadas! Iniciando programa')
-    init()
+    this.createVideo()
 })
+
+
 async function init() {
     return new Promise(async (resolve, reject) => {
         let i = await tools.readOptions('O que deseja fazer?',
@@ -27,7 +30,7 @@ async function init() {
                 "Force download metadata"])
         switch (i) {
             case 0:
-                createVideo()
+                this.createVideo()
                 break;
             case 1:
                 await content.open()
@@ -50,21 +53,7 @@ async function init() {
                 await prepareImages()
                 break;
             case 5:
-                try {
-                    await loadConfigs()
-                    currentVideo.metadata = null
-                    while (!currentVideo.metadata) {
-                        try {
-                            currentVideo.metadata = await content.fetchContent(currentVideo.url);
-                            await tools.saveToJson('./video.json', currentVideo)
-                        } catch (error) {
-                            console.log('Tentando pegando metadados novamente !')
-                        }
-                    }
-                } catch (error) {
-                    console.log("Erro on fetch products")
-                    reject()
-                }
+                await fetchDataFromProductPage()
                 break;
             default:
                 break;
@@ -72,34 +61,26 @@ async function init() {
     })
 }
 
-async function loadConfigs() {
-    return new Promise(async (resolve, reject) => {
-        try {
-            config = await tools.loadJson('./config/config.json')
-            database = await tools.loadJson('./output/database.json')
-            currentVideo = await tools.loadJson('./video.json')
-            resolve()
-        } catch (error) {
-            reject(error)
-        }
-    })
-}
 
-async function createVideo() {
+exports.createVideo =  async function () {
     try {
         await loadConfigs()
         await pelando.fetchData()
-        videoList = await tools.loadJson('./output/pelando.json')
         var video = {}
         for (let index = 0; index < videoList.length; index++) {
             try {
                 console.log('Criando novo video')
+                await loadConfigs()
                 video = videoList[index];
+                console.log(video)
                 if (database.videos.includes(video.url)) {
                     console.log("video ja criado!")
                 } else {
                     try {
                         await creavideoByPelandoData(video)
+                        videoList.splice(index, 1);
+                        await tools.saveToJson('./output/pelando.json', videoList)
+                        await loadConfigs()
                     } catch (error) {
                         console.log("Erro criação video " + JSON.stringify(video))
                     }
@@ -111,7 +92,7 @@ async function createVideo() {
                 process.exit()
             }
         }
-        createVideo()
+        this.createVideo()
     } catch (error) {
         console.log(error)
     }
@@ -119,36 +100,17 @@ async function createVideo() {
 async function creavideoByPelandoData(video) {
     return new Promise(async (resolve, reject) => {
         try {
-
             if (!video.url.includes("/produto/")) reject()
             currentVideo.url = tools.wrapLinkAfiliado(video.url, config.codigo)
             try {
-                currentVideo.metadata = null
-                while (!currentVideo.metadata) {
-                    try {
-                        currentVideo.metadata = await content.fetchContent(video.url);
-                        await tools.saveToJson('./video.json', currentVideo)
-                    } catch (error) {
-                        console.log('Tentando pegando metadados novamente !')
-                    }
-                }
+                currentVideo.metadata = {}
+                currentVideo.metadata = await content.fetchContent(video.url);
+                await tools.saveToJson('./video.json', currentVideo)
             } catch (error) {
                 console.log("Erro on fetch products")
                 reject()
             }
-            currentVideo.price = video.price
-            currentVideo.name = tools.getVideoName(video)
-            if (video.cupom) {
-                currentVideo.inserirCupom = 0
-                currentVideo.cupom = video.cupom
-            } else {
-                currentVideo.inserirCupom = 1
-            }
-            currentVideo.videoTitle = video.name
-            currentVideo.project = config.project
-            currentVideo.output = config.output
-            currentVideo.converted = config.converted
-            currentVideo.tags = config.tags
+            wrapData(video)
             await tools.saveToJson('./video.json', currentVideo)
 
             console.log('Dados do video salvos em videos.json')
@@ -157,6 +119,7 @@ async function creavideoByPelandoData(video) {
                 await prepareImages()
             } catch (error) {
                 console.log('Erro na preparaçao das imagens')
+                creavideoByPelandoData(video)
             }
             try {
 
@@ -168,7 +131,6 @@ async function creavideoByPelandoData(video) {
                 reject()
             }
             try {
-
                 await mountTemplate()
                 await tools.saveToJson('./video.json', currentVideo)
             } catch (error) {
@@ -183,7 +145,6 @@ async function creavideoByPelandoData(video) {
                 console.log('Error on converting')
                 reject()
             }
-
             try {
                 await upload.uploadVideo()
                 database.videos.push(video.url)
@@ -193,7 +154,6 @@ async function creavideoByPelandoData(video) {
                 console.log('Erro on upload')
                 reject()
             }
-
             resolve()
         } catch (error) {
             reject(error)
@@ -208,7 +168,7 @@ async function prepareImages() {
             await tools.cleanImgDir()
             await image.downloadImagesFromMetadata()
             await image.removeBgFromImagesMetadata()
-            await pickImages()
+            await image.pickImages()
             resolve()
         } catch (error) {
             console.log(error)
@@ -218,28 +178,23 @@ async function prepareImages() {
         }
     })
 }
-async function pickImages() {
-    return new Promise(async (resolve, reject) => {
-        currentVideo = await tools.loadJson('./video.json')
-        if (currentVideo.images.length === 1) {
-            currentVideo.primeiraImagem = 0
-            currentVideo.segundaImagem = 0
-            currentVideo.terceiraImagem = 0
+function wrapData(video) {
+    currentVideo.name = tools.getVideoName(video)
+    if (video.cupom) {
+        currentVideo.inserirCupom = 0
+        currentVideo.cupom = video.cupom
+    } else {
+        currentVideo.inserirCupom = 1
+    }
+    currentVideo.price = video.price
+    currentVideo.videoTitle = video.name
+    currentVideo.project = config.project
+    currentVideo.output = config.output
+    currentVideo.converted = config.converted
+    currentVideo.tags = config.tags
 
-        } else if (currentVideo.images.length === 2) {
-            currentVideo.primeiraImagem = 0
-            currentVideo.segundaImagem = 1
-            currentVideo.terceiraImagem = 0
-
-        } else {
-            currentVideo.primeiraImagem = 0
-            currentVideo.segundaImagem = 1
-            currentVideo.terceiraImagem = 2
-        }
-        await tools.saveToJson('./video.json', currentVideo)
-        resolve()
-    })
 }
+
 async function mountTemplate() {
     return new Promise(async (resolve, reject) => {
         try {
@@ -257,5 +212,31 @@ async function mountTemplate() {
 }
 
 
+async function loadConfigs() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            config = await tools.loadJson('./config/config.json')
+            database = await tools.loadJson('./output/database.json')
+            currentVideo = await tools.loadJson('./video.json')
+            videoList = await tools.loadJson('./output/pelando.json')
+            resolve()
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 
 
+
+async function fetchDataFromProductPage() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await loadConfigs()
+            currentVideo.metadata = await content.fetchContent(currentVideo.url);
+            await tools.saveToJson('./video.json', currentVideo)
+        } catch (error) {
+            console.log(error)
+            reject(error)
+        }
+    })
+}

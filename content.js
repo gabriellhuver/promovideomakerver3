@@ -79,6 +79,7 @@ async function extractProductMetadata(body) {
                 } catch (error) { }
             }
         })
+        if (PRODUCT_METADATA === {}) reject()
         resolve(PRODUCT_METADATA)
     })
 }
