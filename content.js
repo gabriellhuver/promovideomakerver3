@@ -42,6 +42,7 @@ exports.fetchContent = function (url) {
             await driver.quit()
             resolve(await extractProductMetadata(body))
         } catch (error) {
+            await driver.quit()
             reject(error)
         }
     })

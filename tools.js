@@ -111,9 +111,14 @@ exports.loadDescription = function (file) {
 }
 exports.downloadFile = function (file_url, targetPath) {
   return new Promise(function (resolve, reject) {
-    options = {
+    const headers = {
+      'Accept': '*/*',
+      'User-Agent': 'request',
+    };
+    var options = {
       url: file_url,
-      dest: targetPath
+      dest: targetPath,
+      headers: headers
     }
     download.image(options)
       .then(({ filename, image }) => {

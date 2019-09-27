@@ -37,7 +37,7 @@ exports.downloadImagesFromMetadata = function () {
         try {
             var video = await tools.loadJson('./video.json')
             video.images = []
-            for (let index = 0; index < video.metadata.images.length; index++) {
+            for (var index = 0; index < video.metadata.images.length; index++) {
                 const imageUrl = video.metadata.images[index].large;
                 try {
                     const file = `./assets/Footage/imgs/image${index}.jpg`;
@@ -45,7 +45,7 @@ exports.downloadImagesFromMetadata = function () {
                     video.images.push(path.join(__dirname, file))
                     console.log(`${imageUrl} -> ${path.join(__dirname, file)} Download Success!`)
                 } catch (error) {
-                    console.log(`Download Failed ! ${imageUrl}`)
+                    reject(error)
                 }
             }
             await tools.saveToJson('./video.json', video)

@@ -13,7 +13,6 @@ function createVideoByHtmldata() {
             app.preferences.saveToDisk();
             app.preferences.reload();
         }
-
         setDebuggerState(true)
         const primeiraImagem = video.imagesNoBg[video.primeiraImagem];
         app.open(new File(video.project))
@@ -27,7 +26,6 @@ function createVideoByHtmldata() {
             app.project.items[1].items[2].items[4].layer(1).sourceText.setValue("Link na descrição!")
 
         }
-        //alert(app.project.items[1].items[1].items[4].layer(2).name)
         app.project.items[1].items[1].items[4].layer(2).source.replace(new File(primeiraImagem))
 
         const segundaImagem = video.imagesNoBg[video.segundaImagem];
