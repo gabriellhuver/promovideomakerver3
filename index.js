@@ -11,7 +11,7 @@ var currentVideo = {}
 var database = []
 var self = this
 
-const DEBUG = true
+const DEBUG = false
 
 loadConfigs().then(async () => {
     console.log('Configurações carregadas! Iniciando programa')
@@ -110,12 +110,13 @@ exports.createVideo = async function () {
                         await tools.saveToJson('./output/pelando.json', videoList)
                         await loadConfigs()
                     } catch (error) {
-                        console.log("Erro criação video " + JSON.stringify(video))
+                        console.log("Erro criação video " + video.name)
                         videoList.splice(0, 1);
                         await tools.saveToJson('./output/pelando.json', videoList)
                         await loadConfigs()
                     }
                 }
+                console.log("Esperando 30Secs para crianção do proximo video")
                 await sleep(1000 * 30)
             }
         } catch (error) {

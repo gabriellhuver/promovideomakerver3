@@ -17,6 +17,7 @@
     "chrome-launcher": "^0.11.2",
     "chromedriver": "^76.0.0",
     "clipboardy": "^2.1.0",
+    "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "gm": "^1.23.1",
