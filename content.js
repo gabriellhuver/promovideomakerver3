@@ -26,21 +26,18 @@ exports.open = function () {
 
 exports.fetchContent = function (url) {
     return new Promise(async (resolve, reject) => {
-        console.log('Acessando dados da pagina de produto')
-        var config = tools.loadJson('./config/config.json')
-
         try {
+            console.log('Acessando dados da pagina de produto')
+            var config = tools.loadJson('./config/config.json')
             var options = new Chrome.Options();
-            //options.addArguments('--user-data-dir=C:/Users/Gabriell Huver/AppData/Local/Google/Chrome/User Data');
             options.addArguments(`--user-data-dir=${config.chrome}`);
-
             var driver = new Builder().withCapabilities(options).build();
             await driver.get('http://americanas.com.br')
             await driver.get(url)
-
             let body = await driver.getPageSource()
             await driver.quit()
-            resolve(await extractProductMetadata(body))
+            let res = await extractProductMetadata(body);
+            resolve(res)
         } catch (error) {
             await driver.quit()
             reject(error)
@@ -80,7 +77,7 @@ async function extractProductMetadata(body) {
                 } catch (error) { }
             }
         })
-        if (PRODUCT_METADATA === {}) reject()
+        if (PRODUCT_METADATA === {}) reject(new Error('Error on fetch product metadata'))
         resolve(PRODUCT_METADATA)
     })
 }

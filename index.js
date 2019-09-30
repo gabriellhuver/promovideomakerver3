@@ -11,15 +11,13 @@ var currentVideo = {}
 var database = []
 var self = this
 
-const DEBUG = false
+const DEBUG = true
 
-loadConfigs().then(() => {
+loadConfigs().then(async () => {
     console.log('Configurações carregadas! Iniciando programa')
     if (DEBUG) init()
-    else self.createVideo()
+    else await self.createVideo()
 })
-
-
 
 async function init() {
     return new Promise(async (resolve, reject) => {
@@ -52,11 +50,11 @@ async function init() {
                     await tools.saveToJson('./video.json', currentVideo)
                 } catch (error) {
                     console.log("Erro on telegram sender")
-                    reject()
+                    reject(new Error("Erro on telegram sender"))
                 }
                 break;
             case 4:
-                prepareImages()
+                await prepareImages()
                 break;
             case 5:
                 await fetchDataFromProductPage()
@@ -86,44 +84,47 @@ function sleep(ms) {
     })
 }
 exports.createVideo = async function () {
-    while (true) {
+    return new Promise(async (resolve, reject) => {
         try {
-            await loadConfigs()
-            if (videoList.length === 0) {
-                await pelando.fetchData()
+            while (true) {
                 await loadConfigs()
-            }
-            var video = {}
-            console.log('Criando novo video')
-            await loadConfigs()
-            video = videoList[0];
-            console.log(video)
-            if (database.videos.includes(video.url)) {
-                console.log("video ja criado!")
-                videoList.splice(0, 1);
-                await tools.saveToJson('./output/pelando.json', videoList)
-                await loadConfigs()
-            } else {
-                try {
-                    await creavideoByPelandoData(video)
-                    videoList.splice(0, 1);
-                    await tools.saveToJson('./output/pelando.json', videoList)
+                if (videoList.length === 0) {
+                    await pelando.fetchData()
                     await loadConfigs()
-                    index--
-                } catch (error) {
-                    console.log("Erro criação video " + JSON.stringify(video))
-                    videoList.splice(0, 1);
-                    await tools.saveToJson('./output/pelando.json', videoList)
-                    await loadConfigs()
-                    index--
                 }
+                var video = {}
+                console.log('Criando novo video')
+                await loadConfigs()
+                video = videoList[0];
+                if (!video) reject(new Error('Error video null'))
+                console.log(video)
+                if (database.videos.includes(video.url)) {
+                    console.log("video ja criado!")
+                    videoList.splice(0, 1);
+                    await tools.saveToJson('./output/pelando.json', videoList)
+                    await loadConfigs()
+                } else {
+                    try {
+                        await creavideoByPelandoData(video)
+                        videoList.splice(0, 1);
+                        await tools.saveToJson('./output/pelando.json', videoList)
+                        await loadConfigs()
+                    } catch (error) {
+                        console.log("Erro criação video " + JSON.stringify(video))
+                        videoList.splice(0, 1);
+                        await tools.saveToJson('./output/pelando.json', videoList)
+                        await loadConfigs()
+                    }
+                }
+                await sleep(1000 * 30)
             }
-            console.log(videoList)
         } catch (error) {
             console.log(error)
+            reject()
+        } finally {
+            await self.createVideo()
         }
-        await sleep(5000)
-    }
+    })
 }
 async function creavideoByPelandoData(video) {
     return new Promise(async (resolve, reject) => {
@@ -132,43 +133,51 @@ async function creavideoByPelandoData(video) {
             currentVideo.url = tools.wrapLinkAfiliado(video.url, config.codigo)
             currentVideo.metadata = {}
             currentVideo.metadata = await content.fetchContent(video.url);
+            if (currentVideo.Product_Name === '') reject(new Error('Error on fetch data'))
             await tools.saveToJson('./video.json', currentVideo)
             console.log('new video')
             wrapData(video)
             await tools.saveToJson('./video.json', currentVideo)
             console.log('Dados do video salvos em videos.json')
-            console.log(currentVideo)
             console.log('Iniciando fase de preparo das imagens...')
-            await tools.cleanImgDir()
-            await image.downloadImagesFromMetadata()
-            await image.removeBgFromImagesMetadata()
-            await image.pickImages()
-            await telegram.createTelegramMessage()
-            //await telegram.telegramSender(config.telegramGroup)
-            await tools.saveToJson('./video.json', currentVideo)
-            console.log('Iniciando montagem do video...')
+            await prepareImages()
+            console.log(currentVideo)
+            currentVideo = await tools.loadJson('./video.json')
             ae.createVideoByHtmldata(currentVideo)
-            await tools.saveToJson('./video.json', currentVideo)
-            //await ae.render()
-            //await ae.convert()
-            await tools.saveToJson('./video.json', currentVideo)
-            //await upload.uploadVideo()
+            await telegram.createTelegramMessage()
+            await telegram.telegramSender(config.telegramGroup)
             database.videos.push(video.url)
             await tools.saveToJson('./output/database.json', database)
+            console.log('Iniciando montagem do video...')
+            await tools.saveToJson('./video.json', currentVideo)
+            await ae.render()
+            await ae.convert()
+            await tools.saveToJson('./video.json', currentVideo)
+            await upload.uploadVideo()
+
             await tools.saveToJson('./video.json', currentVideo)
             resolve()
         } catch (error) {
+            console.log(error)
             console.log(`Erro criacao do video ${JSON.stringify(video)}`)
-            reject()
+            reject(error)
+
         }
     })
 }
 
 async function prepareImages() {
-    await tools.cleanImgDir()
-    await image.downloadImagesFromMetadata()
-    await image.removeBgFromImagesMetadata()
-    await image.pickImages()
+    return new Promise(async (resolve, reject) => {
+        try {
+            await tools.cleanImgDir()
+            await image.downloadImagesFromMetadata()
+            await image.removeBgFromImagesMetadata()
+            await image.pickImages()
+            resolve()
+        } catch (error) {
+            reject(error)
+        }
+    })
 }
 
 

@@ -49,47 +49,51 @@ exports.createVideo = function (client) {
         }
     })
     client.on('startBot', () => {
-        console.log('Starting')
-        newFork = fork('index.js', [], { silent: true })
-        client.emit('status', true)
-        client.emit('message', `Started on ${new Date().toTimeString()}`)
-        newFork.on('message', msg => {
-            console.log(msg);
-            client.emit('message', msg)
-        });
-        newFork.stdout.on('data', (data) => {
-            client.emit('message', data)
-        })
-        newFork.on('close', data => {
-            console.log(data)
-            client.emit('message', 'Stopped close')
+        try {
+            console.log('Starting')
             newFork = fork('index.js', [], { silent: true })
-        })
-        newFork.on('disconnect', data => {
-            console.log(data)
-            client.emit('message', 'Stopped disconnect')
-            client.emit('status', false)
-        })
-        newFork.on('error', data => {
-            console.log(data)
-            client.emit('message', 'Stopped error')
-            client.emit('status', false)
-        })
-        newFork.on('exit', data => {
-            console.log(data)
-            client.emit('message', 'Stopped exit')
-            client.emit('status', false)
-        })
-        newFork.stderr.on('data', (data) => {
-            console.log(data)
-            client.emit('message', data)
-            client.emit('status', false)
-        })
+            client.emit('status', true)
+            client.emit('message', `Started on ${new Date().toTimeString()}`)
+            newFork.on('message', msg => {
+                console.log(msg);
+                client.emit('message', msg)
+            });
+            newFork.stdout.on('data', (data) => {
+                console.log(data)
+                client.emit('message', data)
+            })
+            newFork.on('close', data => {
+                console.log(data)
+                client.emit('message', 'Stopped close')
+            })
+            newFork.on('disconnect', data => {
+                console.log(data)
+                client.emit('message', 'Stopped disconnect')
+                client.emit('status', false)
+            })
+            newFork.on('error', data => {
+                console.log(data)
+                client.emit('message', 'Stopped error')
+                client.emit('status', false)
+            })
+            newFork.on('exit', data => {
+                console.log(data)
+                client.emit('message', 'Stopped exit')
+                client.emit('status', false)
+            })
+            newFork.stderr.on('data', (data) => {
+                console.log(data)
+                client.emit('message', data)
+                client.emit('status', false)
+            })
+        } catch (error) {
+            client.emit('message','Erro on start proccess')
+        }
 
     })
     client.on('stopBot', () => {
         try {
-            console.log('Stopped')
+            console.log(`Stopped by cliend ID: ` + client.id)
             newFork.kill()
             newFork = null;
             client.emit('status', false)

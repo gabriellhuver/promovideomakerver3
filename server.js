@@ -21,7 +21,7 @@ socket.socket(io)
 var port = process.env.PORT || 4000;
 
 http.listen(port, function () {
-    //lauchChrome();
+    lauchChrome();
     console.log(`Server started on http://localhost:${port}`)
 });
 function lauchChrome() {

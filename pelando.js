@@ -136,7 +136,7 @@ async function getRealUrl(url) {
                 resolve(res.request.uri.href)
             } catch (error) {
                 console.log(`Erro ${url}`)
-                reject()
+                reject(new Error('error getting real url'))
             }
         });
     })

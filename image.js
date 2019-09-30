@@ -85,7 +85,7 @@ exports.removeBackground = function (src, dest) {
     return new Promise(async (resolve, reject) => {
         gm(src)
             .write(dest, function (err) {
-                if (err) reject()
+                if (err) reject(new Error('Error on image remove bg'))
                 resolve()
             });
     })
