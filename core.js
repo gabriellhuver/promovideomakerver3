@@ -55,34 +55,31 @@ exports.createVideo = function (client) {
             client.emit('status', true)
             client.emit('message', `Started on ${new Date().toTimeString()}`)
             newFork.on('message', msg => {
-                console.log(msg);
+                console.log(msg.toString());
                 client.emit('message', msg)
             });
             newFork.stdout.on('data', (data) => {
-                console.log(data)
+                console.log(data.toString())
                 client.emit('message', data)
             })
             newFork.on('close', data => {
-                console.log(data)
                 client.emit('message', 'Stopped close')
             })
             newFork.on('disconnect', data => {
-                console.log(data)
                 client.emit('message', 'Stopped disconnect')
                 client.emit('status', false)
             })
             newFork.on('error', data => {
-                console.log(data)
+                console.log(data.toString())
                 client.emit('message', 'Stopped error')
                 client.emit('status', false)
             })
             newFork.on('exit', data => {
-                console.log(data)
                 client.emit('message', 'Stopped exit')
                 client.emit('status', false)
             })
             newFork.stderr.on('data', (data) => {
-                console.log(data)
+                console.log(data.toString())
                 client.emit('message', data)
                 client.emit('status', false)
             })
