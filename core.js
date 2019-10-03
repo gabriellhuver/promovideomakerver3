@@ -2,11 +2,25 @@ const { fork } = require('child_process');
 const tools = require(`./tools`)
 const pelando = require('./pelando')
 const content = require('./content')
-
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms)
+    })
+}
 exports.createVideo = function (client) {
     let newFork = null
+    client.on('remove', async (item) => {
+        var videoList = await tools.loadJson('./output/pelando.json')
+        client.emit('message', 'Removing item')
+        videoList = videoList.filter((obj) => { return obj.name !== item.name; });
+        await tools.saveToJson('./output/pelando.json', videoList)
+        client.emit('remove')
+        client.emit('message', 'Item removed')
+        client.emit('videoList', videoList)
+
+    })
     client.on('message', (msg) => {
-        client.emit('message', msg)
+        client.emit('message', msg.toString())
     })
     client.on('current', async () => {
         const current = await tools.loadJson(`./video.json`)
@@ -58,9 +72,14 @@ exports.createVideo = function (client) {
                 console.log(msg.toString());
                 client.emit('message', msg)
             });
-            newFork.stdout.on('data', (data) => {
+            newFork.stdout.on('data', async (data) => {
                 console.log(data.toString())
-                client.emit('message', data)
+                if (data.toString().includes('Criando novo video')) {
+                    const videoList = await tools.loadJson('./output/pelando.json')
+                    client.emit('videoList', videoList)
+                    console.log('Atualizando lista no front')
+                }
+                client.emit('message', data.toString())
             })
             newFork.on('close', data => {
                 client.emit('message', 'Stopped close')
@@ -80,11 +99,11 @@ exports.createVideo = function (client) {
             })
             newFork.stderr.on('data', (data) => {
                 console.log(data.toString())
-                client.emit('message', data)
+                client.emit('message', data.toString())
                 client.emit('status', false)
             })
         } catch (error) {
-            client.emit('message','Erro on start proccess')
+            client.emit('message', 'Erro on start proccess')
         }
 
     })
@@ -97,6 +116,17 @@ exports.createVideo = function (client) {
         } catch (error) {
             console.log('Tentativa de stop falhada!')
         }
+    })
+    client.on('delay', async data => {
+        console.log(`Changing delay ${data}`)
+        let config = await tools.loadJson('./config/config.json')
+        config.delay = data;
+        await tools.saveToJson('./config/config.json', config)
+        client.emit(data)
+    })
+    client.on('getConfig', async () => {
+        let config = await tools.loadJson('./config/config.json')
+        client.emit('getConfig', config)
     })
 
 }

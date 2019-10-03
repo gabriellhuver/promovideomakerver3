@@ -6,7 +6,7 @@ const request = require('request')
 const after = require('./after-effects')
 async function testePelando() {
     try {
-       await after.render()
+       await upload.uploadVideo()
     } catch (error) {
         console.log(error)
     }

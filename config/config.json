@@ -4,6 +4,7 @@
     "project": "C:\\node\\promo-video-maker-ver3\\assets\\produto.aep",
     "chrome": "C:\\node\\promo-video-maker-ver3\\chrome",
     "comp": "Project Final",
+    "delay": 106,
     "OMtemplate": "Sem perdas",
     "output": "C:\\node\\promo-video-maker-ver3\\output\\video.avi",
     "converted": "C:\\node\\promo-video-maker-ver3\\output\\video.mp4",

@@ -1,7 +1,13 @@
 <template>
   <v-content>
     <div class="listBox">
-      <v-data-table :headers="headers" :items="items" :items-per-page="5" class="elevation-1">
+      <v-data-table
+        :loading="loadingList"
+        :headers="headers"
+        :items="items"
+        :items-per-page="5"
+        class="elevation-1"
+      >
         <template v-slot:item.seller="{ item }">
           <b class="empix">{{item.seller}}</b>
         </template>
@@ -22,6 +28,11 @@
           <a style="text-decoration:none;" :href="item.url" target="_blank">
             <v-icon>mdi-open-in-new</v-icon>
           </a>
+        </template>
+        <template v-slot:item.remove="{ item }">
+          <v-btn :loading="removeLoading" icon @click="remove(item)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
         </template>
       </v-data-table>
     </div>
@@ -68,20 +79,33 @@ export default {
           align: "left",
           sortable: true,
           value: "url"
+        },
+        {
+          text: "Remover",
+          align: "left",
+          sortable: false,
+          value: "remove"
         }
       ],
       items: [],
-      temperatureColor: "red"
+      temperatureColor: "red",
+      removeLoading: false,
+      loadingList: false
     };
   },
   created() {
+    this.loadingList = true;
     this.sockets.subscribe("videoList", data => {
       this.items = data;
+      this.loadingList = false;
+    });
+    this.sockets.subscribe("remove", data => {
+      this.removeLoading = false;
     });
     this.$socket.emit("videoList");
     setInterval(() => {
       this.$socket.emit("videoList");
-    }, 2500);
+    }, 1000);
   },
   methods: {
     icon(item) {
@@ -89,6 +113,10 @@ export default {
     },
     color(item) {
       return item.percent >= 350 ? "red" : "orange";
+    },
+    remove(item) {
+      this.removeLoading = true;
+      this.$socket.emit("remove", item);
     }
   }
 };

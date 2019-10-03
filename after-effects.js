@@ -61,8 +61,6 @@ function createVideoByHtmldata() {
         }
     }, video);
 
-
-
 }
 
 
@@ -79,19 +77,14 @@ function render() {
             '-OMtemplate', config.OMtemplate
         ]);
         ae.stderr.on('data', function (data) {
-            process.stdout.write("\r");
-            process.stdout.write("\x1b[31m" + data.toString());
-            process.stdout.write("\x1b[0m")
+            console.log(data.toString())
         });
         ae.stdout.on('data', function (data) {
-            process.stdout.write("\r");
-            process.stdout.write(data.toString());
+            console.log(data.toString())
         })
         ae.on('close', function (code) {
             // Video has rendered
-            process.stdout.write("\r");
-            process.stdout.write("\x1b[32m Renderização finalizada !");
-            process.stdout.write("\x1b[0m")
+            console.log('Renderização finalizada')
             resolve(code)
         });
     })
@@ -114,12 +107,9 @@ async function convert() {
             })
             .on('progress', progress => {
 
-                process.stdout.write("\r");
-                process.stdout.write(`Preparando video para upload - Percent complete: ${progress.percentComplete}%, ETA: ${progress.eta}`);
-
+                console.log(`Preparando video para upload - Percent complete: ${progress.percentComplete}%, ETA: ${progress.eta}`)
                 if (progress.percentComplete === 100) {
                     console.log('\nConversão finalizada')
-
                     resolve()
                 }
             })

@@ -14,8 +14,9 @@ var YoutubeVideoTittleXPATH = '//*[@id="upload-item-0"]' +
     'div/label[1]/span/input'
 
 exports.uploadVideo = async function () {
-    var config = tools.loadJson('./config/config.json')
+    const config = tools.loadJson('./config/config.json')
     var video = tools.loadJson('./video.json')
+    console.log(`Iniciando o upload do video ${video.name}`)
     var desc
     if (video.inserirCupom == 0) {
         desc = tools.loadDescription(config.descCupom).toString()
@@ -43,7 +44,7 @@ exports.uploadVideo = async function () {
             .sendKeys(video.converted)
     } catch (error) {
         console.log('erro no input')
-        driver.close()
+        await driver.close()
     }
     try {
         await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[2]/div/div/div[1]/div[3]/form/div[1]/fieldset[1]/div/label[1]/span/input')).clear();
@@ -54,7 +55,7 @@ exports.uploadVideo = async function () {
 
     } catch (error) {
         console.log('erro elems')
-        driver.close()
+        await driver.close()
     }
     var tagElement = await driver.findElement(By.xpath("//*[@id=\"upload-item-0\"]/div[3]/div[2]/div/div/div[1]/div[3]/form/div[1]/fieldset[1]/div/div/span/div/span/input"));
     tags = video.tags
@@ -66,17 +67,16 @@ exports.uploadVideo = async function () {
         try {
             var tt = await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[2]/div[2]/div[1]')).getText();
             var progress = await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[1]/div[2]/div[2]/div[1]/span/span')).getText();
-            process.stdout.write("\r");
-            process.stdout.write("\x1b[32m" +
-                'Uploading video -> | ' + progress + ' | for ' + video.name);
-            process.stdout.write("\x1b[0m")
-
+            if (progress) {
+                console.log(`Uploading video ${progress} - ${video.name}`)
+            }
             await sleep(3000)
             if (tt === 'Upload concluído!') {
                 tr = false
                 await driver.findElement(By.xpath('//*[@id="upload-item-0"]/div[3]/div[1]/div[1]/div/div/button')).click();
                 await sleep(3000)
                 await driver.quit()
+                console.log(`Uploading concluido ${progress} - ${video.name}`)
             }
         } catch (error) {
             console.log(error)

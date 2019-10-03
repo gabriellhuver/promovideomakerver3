@@ -1,16 +1,24 @@
 <template>
   <v-content>
     <div>
-      <ul style="list-style: none;">
+      <ul class="list">
         <li>
-          <h4>Video atual</h4>
+          <h4>
+            <b>Video atual</b>
+          </h4>
         </li>
         <li>
           <i>Título:</i>
-          {{current.videoTitle}}
+          {{" "+current.videoTitle}}
         </li>
-        <li>Preço: {{current.price}}</li>
-        <li v-if="current.cupom != ''">Cupom: {{current.cupom}}</li>
+        <li>
+          <i>Preço:</i>
+          {{" "+current.price}}
+        </li>
+        <li v-if="current.cupom != ''">
+          <i>Cupom:</i>
+          {{" "+current.cupom}}
+        </li>
       </ul>
     </div>
   </v-content>
@@ -18,17 +26,13 @@
 
 <script>
 export default {
-  props: ["current"],
-
-  data() {
-    return {};
-  },
-  created() {}
+  props: ["current"]
 };
 </script>
 
 <style>
-img {
-  width: 230px;
+.list {
+  list-style: none;
+  font-family: "Turret Road", cursive;
 }
 </style>

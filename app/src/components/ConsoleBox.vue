@@ -1,7 +1,7 @@
 <template>
   <v-content>
     <div>
-      <i>{{msg}}</i>
+      <i class="console">{{msg}}</i>
     </div>
   </v-content>
 </template>
@@ -20,4 +20,7 @@ export default {
 </script>
 
 <style>
+.console{
+  font-family: "Turret Road", cursive;
+}
 </style>

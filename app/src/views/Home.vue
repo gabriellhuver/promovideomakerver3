@@ -12,7 +12,7 @@ import ControlBox from "../components/ControlBox";
 import ConsoleBox from "../components/ConsoleBox";
 import CurrentVideo from "../components/CurrentVideo";
 import VideoList from "../components/VideoList";
-const utf8decoder = new TextDecoder();
+
 export default {
   components: {
     ControlBox,
@@ -36,12 +36,7 @@ export default {
       this.current = data;
     });
     this.sockets.subscribe("message", msg => {
-      try {
-        this.msg = utf8decoder.decode(msg);
-        console.log(this.msg.data);
-      } catch (error) {
-        this.msg = msg;
-      }
+      this.msg = msg.toString();
     });
     setInterval(() => {
       this.$socket.emit("status");

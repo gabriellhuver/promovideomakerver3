@@ -116,8 +116,9 @@ exports.createVideo = async function () {
                         await loadConfigs()
                     }
                 }
-                console.log("Esperando 30Secs para crianção do proximo video")
-                await sleep(1000 * 30)
+                await loadConfigs()
+                console.log(`Esperando ${config.delay} Secs para crianção do proximo video`)
+                await sleep(1000 * config.delay)
             }
         } catch (error) {
             console.log(error)
@@ -145,17 +146,21 @@ async function creavideoByPelandoData(video) {
             console.log(currentVideo)
             currentVideo = await tools.loadJson('./video.json')
             ae.createVideoByHtmldata(currentVideo)
+            console.log('Video criado com sucesso!')
             await telegram.createTelegramMessage()
+            console.log('Mensagem do telegram criada!')
             await telegram.telegramSender(config.telegramGroup)
             database.videos.push(video.url)
             await tools.saveToJson('./output/database.json', database)
             console.log('Iniciando montagem do video...')
             await tools.saveToJson('./video.json', currentVideo)
+            console.log('Iniciando renderização!')
             await ae.render()
+            console.log('Iniciando conversão!')
             await ae.convert()
             await tools.saveToJson('./video.json', currentVideo)
             await upload.uploadVideo()
-
+            console.log('Upload finalizado!')
             await tools.saveToJson('./video.json', currentVideo)
             resolve()
         } catch (error) {

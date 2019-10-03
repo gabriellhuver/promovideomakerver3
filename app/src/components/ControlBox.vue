@@ -14,7 +14,7 @@
         <v-icon>mdi-close</v-icon>KILL
       </v-btn>
     </v-content>
-    <v-btn v-if="!loading" :loading="renewLoading" @click="renew">
+    <v-btn v-if="!this.$store.state.status" :loading="renewLoading" @click="renew">
       <v-icon>mdi-sync</v-icon>Atualizar lista
     </v-btn>
   </v-content>
